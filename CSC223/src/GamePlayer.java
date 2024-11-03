@@ -1,12 +1,32 @@
 import java.util.Random;
 //import game.Game;
+import java.util.Stack;   										 //using stacks for DFS strategy to game player
+import java.util.LinkedList;									 //using linked list for internal memory
 
 public class GamePlayer {
-	private static int[][] map;
-	private static boolean[][] visited;
-	private static int x, y;
+	private static int[][] map; 								//internal map that will be updated as we move
+	private static boolean[][] visited; 						//internal map that will be updated as we move
+	private static int x, y;  									//x= columns, y= rows
 	
-	private static boolean canMoveDown() {
+
+	private static void moveDown() {							 //AI will move down if it's allowed
+		System.out.println("Exploring down at (" + ++x + ", " + y + ")");
+		visited[x][y] = true;
+	}
+	private static void moveUp() { 								//AI will move down if it's allowed
+		System.out.println("Moving back up to (" + --x + ", " + y + ")");
+		visited[x][y] = true;
+	}
+	private static void moveRight() { 							//AI will move down if it's allowed
+		System.out.println("Exploring right at (" + x + ", " + ++y + ")");
+		visited[x][y] = true;
+	}
+	private static void moveLeft() { 							//AI will move down if it's allowed
+		System.out.println("Moving back left to (" + x + ", " + --y + ")");
+		visited[x][y] = true;
+	}
+	
+	private static boolean canMoveDown() { 						//AI will check if it is able to move down
 		if ((x < 6) && !visited[x+1][y]) {
 			return true;
 		}
@@ -14,7 +34,7 @@ public class GamePlayer {
 			return false;
 		}
 	}
-	private static boolean canMoveRight() {
+	private static boolean canMoveRight() { 					//AI will check if it is able to move right
 		if ((y < 6) && !visited[x][y+1]) {
 			return true;
 		}
@@ -22,23 +42,8 @@ public class GamePlayer {
 			return false;
 		}
 	}
-	private static void moveDown() {
-		System.out.println("Exploring down at (" + ++x + ", " + y + ")");
-		visited[x][y] = true;
-	}
-	private static void moveUp() {
-		System.out.println("Moving back up to (" + --x + ", " + y + ")");
-		visited[x][y] = true;
-	}
-	private static void moveRight() {
-		System.out.println("Exploring right at (" + x + ", " + ++y + ")");
-		visited[x][y] = true;
-	}
-	private static void moveLeft() {
-		System.out.println("Moving back left to (" + x + ", " + --y + ")");
-		visited[x][y] = true;
-	}
-	private static boolean exploreDown() {
+	
+	private static boolean exploreDown() { 			//AI will decide where to move depending on if it is able to move down
 		if (canMoveDown()) {
 			moveDown();
 			if (map[x][y] == 1) {
@@ -59,10 +64,10 @@ public class GamePlayer {
 				}
 			}
 		}
-		return false;
-		
+		return false;	
 	}
-	private static boolean exploreRight() {
+	
+	private static boolean exploreRight() { 		//AI will decide where to move depending on if it is able to move right
 		if (canMoveRight()) {
 			moveRight();
 			if (map[x][y] == 1) {
@@ -84,8 +89,8 @@ public class GamePlayer {
 			}
 		}
 		return false;
-		
 	}
+	
 	private static void findTheValue( ) {
 		System.out.println("Starting at (" + x + ", " + y + ")");
 		visited[x][y] = true;
@@ -110,3 +115,12 @@ public class GamePlayer {
 		findTheValue();
 	}
 }
+
+		/*
+		create a AI game player that will play the game
+		use a stack to do DFS, and going around the obstacles but storing the information
+		finding the shovel first and finding the treasure chest
+		Testing to perfect the program to be able to do various maps.
+		 */
+
+
