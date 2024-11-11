@@ -1,119 +1,108 @@
-import java.util.Random;
-//import game.Game;
+import game.Game;												 //import the required library for game
+import game.exception.GamePlayException;
+import game.exception.InvalidGameActionException;
 import java.util.Stack;   										 //using stacks for DFS strategy to game player
 import java.util.LinkedList;									 //using linked list for internal memory
 
 public class GamePlayer {
-	private static int[][] map; 								//internal map that will be updated as we move
-	private static boolean[][] visited; 						//internal map that will be updated as we move
-	private static int x, y;  									//x= columns, y= rows
+	static class Position {										//setting the constructor
+		int x, y;
+		Position(int x, int y){
+			this.x = x;
+			this.y = y;
+		}
+	}
+	
+	static Stack<Position> stack = new Stack<>();
+	static LinkedList<Position> visited = new LinkedList<>();
+	
+	private static int x, y;  									//x= rows, y= columns
 	
 
-	private static void moveDown() {							 //AI will move down if it's allowed
-		System.out.println("Exploring down at (" + ++x + ", " + y + ")");
-		visited[x][y] = true;
+	private static void moveDown() {                            //AI will move down if it's allowed
+		stack.push(new Position(x, y));
+		System.out.println("Moving down to (" + ++x + ", " + y + ")");
+		visited.add(new Position(x,y));
 	}
 	private static void moveUp() { 								//AI will move down if it's allowed
-		System.out.println("Moving back up to (" + --x + ", " + y + ")");
-		visited[x][y] = true;
+		stack.pop();
+		System.out.println("Moving up to (" + --x + ", " + y + ")");
+		visited.add(new Position(x,y));
 	}
 	private static void moveRight() { 							//AI will move down if it's allowed
-		System.out.println("Exploring right at (" + x + ", " + ++y + ")");
-		visited[x][y] = true;
+		stack.push(new Position(x, y));
+		System.out.println("Moving right to (" + x + ", " + ++y + ")");
+		visited.add(new Position(x,y));
 	}
 	private static void moveLeft() { 							//AI will move down if it's allowed
-		System.out.println("Moving back left to (" + x + ", " + --y + ")");
-		visited[x][y] = true;
+		stack.pop();
+		System.out.println("Moving left to (" + x + ", " + --y + ")");
+		//visited.add(new Position(x,y));
+	}
+	
+	private static boolean isVisited(int x, int y){				//boolean to check if it is visited
+		return visited.contains(new Position(x, y));
 	}
 	
 	private static boolean canMoveDown() { 						//AI will check if it is able to move down
-		if ((x < 6) && !visited[x+1][y]) {
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+		return ((x < 6) && !isVisited(x+1, y));	
+	}	
 	private static boolean canMoveRight() { 					//AI will check if it is able to move right
-		if ((y < 6) && !visited[x][y+1]) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return ((y < 6) && !isVisited(x, y+1));
+	}
+	private static boolean canMoveUp() {						//AI will check if it is able to move up	
+		return (x > 0 && !isVisited(x-1, y));
+	}
+	private static boolean canMoveLeft() {						//AI will check if it is able to move left
+		return (y > 0 && !isVisited(x, y-1));
 	}
 	
-	private static boolean exploreDown() { 			//AI will decide where to move depending on if it is able to move down
+	
+	private static void explore() throws GamePlayException, InvalidGameActionException {				//Main AI function of how it is getting around
+		if (Game.hasShovel()) {
+			Game.pickShovel();
+			System.out.println("Found the shovel at (" + x + ", " + y + ")");
+			
+		}
+		if (Game.hasTreasure()) {
+			System.out.println("Found the treasure at (" + x + ", " + y + ")");
+			Game.digTreasure();
+		}
 		if (canMoveDown()) {
-			moveDown();
-			if (map[x][y] == 1) {
-				System.out.println("Found it at (" + x + ", " + y + ")");
-				return true;
-			}
-			else {
-				boolean result = exploreDown();
-				if (result) {
-					return result;
-				}
-				else {
-					result = exploreRight();
-					if (!result) {
-						moveUp();
-					}
-					return result;
-				}
-			}
+			 moveDown();
+			 if (!Game.hasShovel() && !Game.hasTreasure()) {
+				 explore();
+			 }
 		}
-		return false;	
-	}
-	
-	private static boolean exploreRight() { 		//AI will decide where to move depending on if it is able to move right
-		if (canMoveRight()) {
+		else if (canMoveRight()) {
 			moveRight();
-			if (map[x][y] == 1) {
-				System.out.println("Found it at (" + x + ", " + y + ")");
-				return true;
-			}
-			else {
-				boolean result = exploreDown();
-				if (result) {
-					return result;
-				}
-				else {
-					result = exploreRight();
-					if (!result) {
-						moveLeft();
-					}
-					return result;
-				}
-			}
+			 if (!Game.hasShovel() && !Game.hasTreasure()) {
+				 explore();
+			 }
 		}
-		return false;
-	}
-	
-	private static void findTheValue( ) {
-		System.out.println("Starting at (" + x + ", " + y + ")");
-		visited[x][y] = true;
-		if (map[x][y] == 1) {
-			System.out.println("Found it at (" + x + ", " + y + ")");
-			return;
+		else if (canMoveUp()) {
+			moveUp();
+			 if (!Game.hasShovel() && !Game.hasTreasure()) {
+				 explore();
+			 }
 		}
-		boolean result = exploreDown();
-		if (!result) {
-			exploreRight();
+		else if (canMoveLeft()) {
+			moveLeft();
+			 if (!Game.hasShovel() && !Game.hasTreasure()) {
+				 explore();
+			 }
 		}
 	}
-	public static void main(String[] args) {
-		map = new int[7][7];
-		visited = new boolean[7][7];
-		Random generator = new Random();
-		map[generator.nextInt(0, 7)][generator.nextInt(0, 7)] = 1;
 		
-		x = 0;
-		y = 0;
+	public static void main(String[] args) throws GamePlayException, InvalidGameActionException {
+		Game.play();
+		explore();
 		
-		findTheValue();
-	}
+		if (!Game.hasTreasure()) {
+			System.out.println();
+			System.out.println("Could not complete task.");
+		}
+	} 
 }
 
 		/*
@@ -121,6 +110,8 @@ public class GamePlayer {
 		use a stack to do DFS, and going around the obstacles but storing the information
 		finding the shovel first and finding the treasure chest
 		Testing to perfect the program to be able to do various maps.
+		
+		
+		at every space check if the space has the shovel with the method call
 		 */
-
 
