@@ -27,7 +27,7 @@ public class GamePlayer {
 	private static void moveUp() { 								//AI will move down if it's allowed
 		stack.pop();
 		System.out.println("Moving up to (" + --x + ", " + y + ")");
-		visited.add(new Position(x,y));
+		//visited.add(new Position(x,y));
 	}
 	private static void moveRight() { 							//AI will move down if it's allowed
 		stack.push(new Position(x, y));
@@ -58,7 +58,7 @@ public class GamePlayer {
 	}
 	
 	
-	private static void explore() throws GamePlayException, InvalidGameActionException {				//Main AI function of how it is getting around
+	private static void explore() throws GamePlayException, InvalidGameActionException {//Main AI function of how it is getting around
 		if (Game.hasShovel()) {
 			Game.pickShovel();
 			System.out.println("Found the shovel at (" + x + ", " + y + ")");
@@ -70,33 +70,43 @@ public class GamePlayer {
 		}
 		if (canMoveDown()) {
 			 moveDown();
-			 if (!Game.hasShovel() && !Game.hasTreasure()) {
-				 explore();
-			 }
 		}
 		else if (canMoveRight()) {
-			moveRight();
-			 if (!Game.hasShovel() && !Game.hasTreasure()) {
-				 explore();
-			 }
+			moveRight();	
 		}
 		else if (canMoveUp()) {
 			moveUp();
-			 if (!Game.hasShovel() && !Game.hasTreasure()) {
-				 explore();
-			 }
 		}
 		else if (canMoveLeft()) {
 			moveLeft();
-			 if (!Game.hasShovel() && !Game.hasTreasure()) {
-				 explore();
-			 }
 		}
+		 /*if (!Game.hasShovel() && !Game.hasTreasure()) {
+			 explore();
+		 } else return;*/
 	}
 		
 	public static void main(String[] args) throws GamePlayException, InvalidGameActionException {
 		Game.play();
 		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		explore();
+		
 		
 		if (!Game.hasTreasure()) {
 			System.out.println();
@@ -104,14 +114,4 @@ public class GamePlayer {
 		}
 	} 
 }
-
-		/*
-		create a AI game player that will play the game
-		use a stack to do DFS, and going around the obstacles but storing the information
-		finding the shovel first and finding the treasure chest
-		Testing to perfect the program to be able to do various maps.
-		
-		
-		at every space check if the space has the shovel with the method call
-		 */
 
