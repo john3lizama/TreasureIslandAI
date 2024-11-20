@@ -27,14 +27,13 @@ public class GamePlayer {
 	static LinkedList<Position> visited = new LinkedList<>();
 	static LinkedList<Position> obstacles = new LinkedList<>(); 
 	
-	private static int x = 1, y;  									//x= rows, y= columns
+	private static int x, y;  									//x= rows, y= columns
 	
 	private static void addObstacles(int x, int y) {
 		Position pos = new Position(x, y);
 		if (!obstacles.contains(pos)) {
 			obstacles.add(pos);
-		}
-		
+		}	
 	}
 	
 	private static void moveDown() {                            //AI will move down if it's allowed
@@ -83,22 +82,25 @@ public class GamePlayer {
 		}
 
 	}
-	
+
+	private static boolean isObstacle(int x, int y) {
+		return obstacles.contains(new Position(x, y));
+	}
 	private static boolean isVisited(int x, int y){				//boolean to check if it is visited
 		return visited.contains(new Position(x, y));			//uses an equals method to compare
 	}
 	
 	private static boolean canMoveDown() throws GamePlayException { 						//AI will check if it is able to move down
-		return ((x < Game.getRows() -1) && !isVisited(x+1, y));	
+		return ((x < Game.getRows() -1) && !isVisited(x+1, y) && !isObstacle(x+1, y));	
 	}	
 	private static boolean canMoveRight() throws GamePlayException { 					//AI will check if it is able to move right
-		return ((y < Game.getColumns() - 1) && !isVisited(x, y+1));
+		return ((y < Game.getColumns() - 1) && !isVisited(x, y+1) && !isObstacle(x, y+1));
 	}
 	private static boolean canMoveUp() {						//AI will check if it is able to move up	
-		return (x > 0 && !isVisited(x-1, y));
+		return (x > 0 && !isVisited(x-1, y) && !isObstacle(x-1, y));
 	}
 	private static boolean canMoveLeft() {						//AI will check if it is able to move left
-		return (y > 0 && !isVisited(x, y-1));
+		return (y > 0 && !isVisited(x, y-1) && !isObstacle(x, y-1));
 	}
 	
 	
@@ -134,7 +136,7 @@ public class GamePlayer {
         return; // No moves left to explore
     }
 		
-		if (!Game.hasShovel() && stack.size() < 9) {
+		if (stack.size() < 40) {
 		 explore();
 		 } else {
 			 return;
@@ -155,4 +157,19 @@ public class GamePlayer {
 		Game.quit();
 	} 
 }
+
+
+/*
+ * 	Things to figure out,
+ * 		1. Aligning visited with actual map
+ * 		2. Properly implementing DFS 
+ * 		3. Backtracking
+ * 
+ */
+
+
+
+
+
+
 
