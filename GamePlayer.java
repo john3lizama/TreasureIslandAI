@@ -50,7 +50,7 @@ public class GamePlayer {
 			++x;												//must change the value before other tasks
 			stack.push(new Position(x, y));						//updating our posistion + memory
 			visited.add(new Position(x,y));
-			System.out.println("location is(" + x + ", " + y + ")" );
+			System.out.println("location is (" + x + ", " + y + ")" );
 		} 
 		catch (Exception e) {									//When we find an game exception we add it to gameMap
 			System.out.println("Can't move there, finding another way around.");
@@ -63,7 +63,7 @@ public class GamePlayer {
 			--x;												//must change the value before other tasks
 			stack.push(new Position(x, y));						//updating our posistion + memory
 			visited.add(new Position(x,y));
-			System.out.println("location is(" + x + ", " + y + ")" );
+			System.out.println("location is (" + x + ", " + y + ")" );
 		} catch (Exception e) {									//When we find an game exception we add it to gameMap
 			System.out.println("Can't move there, finding another way around.");
 			addObstacles(x - 1, y);						//adding to gameMap/Obstacle(linkedList) (will fix for final code)
@@ -75,7 +75,7 @@ public class GamePlayer {
 			++y;												//must change the value before other tasks
 			stack.push(new Position(x, y));						//updating our posistion + memory
 			visited.add(new Position(x,y));
-			System.out.println("location is(" + x + ", " + y + ")" );
+			System.out.println("location is (" + x + ", " + y + ")" );
 		} catch (Exception e) {									//When we find an game exception we add it to gameMap
 			System.out.println("Can't move there, finding another way around.");
 			addObstacles(x, y + 1);						//adding to gameMap/Obstacle(linkedList) (will fix for final code)
@@ -87,7 +87,7 @@ public class GamePlayer {
 			--y;												//must change the value before other tasks
 			stack.push(new Position(x, y));						//updating our posistion + memory
 			visited.add(new Position(x,y));
-			System.out.println("location is(" + x + ", " + y + ")" );
+			System.out.println("location is (" + x + ", " + y + ")" );
 		} catch (Exception e) {									//When we find an game exception we add it to gameMap
 			System.out.println("Can't move there, finding another way around.");
 			addObstacles(x, y - 1);						//adding to gameMap/Obstacle(linkedList) (will fix for final code)
@@ -99,8 +99,8 @@ public class GamePlayer {
 		return obstacles.contains(new Position(x, y));
 	}
 	private static boolean isVisited(int x, int y){				//boolean to check if it is visited
-		return visited.contains(new Position(x, y));			//uses an equals method to compare
-	}
+		return visited.contains(new Position(x, y));
+		}
 	
 	private static boolean canMoveDown() throws GamePlayException { 						//AI will check if it is able to move down
 		return ((x < Game.getRows() -1) && !isVisited(x+1, y) && !isObstacle(x+1, y));	
@@ -143,12 +143,72 @@ public class GamePlayer {
 		}
 	}
 	
+	private static void shovelToTreasure() throws GamePlayException, InvalidGameActionException, InvalidGameMoveException {
+	    // Retrieve positions of shovel and treasure
+	    LinkedList<Position> shovelList = gameMap.get("Shovel");
+	    LinkedList<Position> treasureList = gameMap.get("Treasure");
+
+	    if (shovelList == null || treasureList == null || shovelList.isEmpty() || treasureList.isEmpty()) {
+	        System.out.println("Shovel or Treasure positions are missing in the game map.");
+	        return;
+	    }
+
+	    Position shovelPosition = shovelList.getFirst();
+	    Position treasurePosition = treasureList.getFirst();
+
+	    int shovelX = shovelPosition.x;
+	    int shovelY = shovelPosition.y;
+	    int treasureX = treasurePosition.x;
+	    int treasureY = treasurePosition.y;
+
+	    System.out.println("Moving from shovel at (" + shovelX + ", " + shovelY + ") to treasure at (" + treasureX + ", " + treasureY + ")");
+
+	    // Align current position with the shovel's position if necessary
+	    while (x != shovelX || y != shovelY) {
+	        if (x < shovelX) moveDown();
+	        else if (x > shovelX) moveUp();
+	        else if (y < shovelY) moveRight();
+	        else if (y > shovelY) moveLeft();
+	    }
+
+	    // Move from shovel to treasure
+	    while (x != treasureX || y != treasureY) {
+	        if (x < treasureX && canMoveDown()) moveDown();
+	        else if (x > treasureX && canMoveUp()) moveUp();
+	        else if (y < treasureY && canMoveRight()) moveRight();
+	        else if (y > treasureY && canMoveLeft()) moveLeft();
+	        else { // Handle obstacles or invalid moves
+	            System.out.println("Obstacle or no valid move. Backtracking...");
+	            backtrack();
+	        }
+	    }
+
+	    System.out.println("Reached the treasure at (" + treasureX + ", " + treasureY + ")");
+	    System.out.println(Game.hasShovel());
+	    Game.digTreasure();
+	}
+	
 	private static void explore() throws GamePlayException, InvalidGameActionException, InvalidGameMoveException {//Main AI function of how it is getting around
 		if (Game.hasShovel()) {
+
+			Game.pickShovel();
+			try { 
+				Game.pickShovel();
+			}
+			catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+			System.out.println("At location (" + x + ", " + y + "), hasShovel: " + Game.hasShovel());
+
 			gameMap.put("Shovel", new LinkedList<>());								//When we find shovel, create a new key 
 			gameMap.get("Shovel").add(new Position(x, y));							//and store the location as the value
 			System.out.println("Found the shovel at (" + x + ", " + y + ")");		//Found at (3, 6)
-			Game.pickShovel();														//picking up the shovel
+			System.out.println(Game.hasShovel());
+			if (gameMap.containsKey("Treasure")) {
+				shovelToTreasure();
+				Game.digTreasure();
+				return;
+			}
 		}
 		if (Game.hasTreasure()) {
 			gameMap.put("Treasure", new LinkedList<>());						//When we find treasure, create a new key
@@ -157,10 +217,10 @@ public class GamePlayer {
 			if (Game.hasShovel()) {										//incase we have the shovel, we finish the game
 				Game.digTreasure();
 			}
-		}			//*****************************************************************************************************
+		}			//**************************************************************************************************\\
 		if (canMoveDown()) {				//this is not DFS, we must figure out a way to properly implement it 
-			moveDown();						//our program does in a circle
-		} 			//**************************************************************************************************
+			moveDown();						//our program goes in a circle
+		} 			//**************************************************************************************************\\
 		else if (canMoveRight()) {
 			moveRight();
 		}
@@ -187,7 +247,6 @@ public class GamePlayer {
 		while (!stack.isEmpty()) {			//Debugging purpose
 			System.out.println(stack.pop());
 		}
-		
 		if (!Game.hasTreasure()) {				//Debugging purpose
 			System.out.println();
 			System.out.println("Could not complete task.");	
