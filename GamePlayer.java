@@ -118,21 +118,24 @@ public class GamePlayer {
 			try {									//Trying incase we run into a obstacle
 				Position backtrack = stack.pop();		//assigning the lastest pos to backtrack
 				while (!Game.getLocation().toString().equals(backtrack.toString())) {	//loop to make sure we are alligned
-					if (x > backtrack.x) {
-						Game.moveUp();	
-					} else if (x < backtrack.x) {
-						Game.moveDown();
-					} else if (y > backtrack.y) {
+					if (Game.getLocation().getColumn() > backtrack.y) {
 						Game.moveLeft();
-					} else if (y < backtrack.y) {
+					} else if (Game.getLocation().getRow() > backtrack.x) {
+						Game.moveUp();
+					} else if (Game.getLocation().getColumn() < backtrack.y) {
 						Game.moveRight();
+					} else if (Game.getLocation().getRow() < backtrack.x) {
+						Game.moveDown();
 					}
+//					System.out.println("LOCATED IN MEMORY (" + x + ", " + y + "), IN GAME (" + backtrack.x + ", " + backtrack.y +")");
 				}
 				x = backtrack.x;					
 				y = backtrack.y;
-				
-				System.out.println("Backtracking from (" + x + ", " + y + ")"); //annoucing for debugging
-				
+				System.out.println("UPDATED LOCATED IN MEMORY (" + x + ", " + y + "), IN GAME (" + backtrack.x + ", " + backtrack.y +")");
+
+
+//				System.out.println("Backtracking from (" + x + ", " + y + ")"); //annoucing for debugging
+
 			} catch (Exception e) {
 				System.out.println("Error:" + e.getMessage()); //I saw professor use the getmessage which
 			}													// displays what the error message is
@@ -174,53 +177,159 @@ public class GamePlayer {
 	}
 	
 	private static void explore() throws GamePlayException, InvalidGameActionException, InvalidGameMoveException {//Main AI function of how it is getting around
+		System.out.println("Current Stack: " + stack);
+		System.out.println("Visited Positions: " + visited);
+//		System.out.println("Game Map: " + gameMap);
 		if (Game.hasShovel()) {
 			Game.pickShovel();
-			gameMap.put("Shovel", new LinkedList<>());								//When we find shovel, create a new key 
+			gameMap.putIfAbsent("Shovel", new LinkedList<>());								//When we find shovel, create a new key 
 			gameMap.get("Shovel").add(new Position(x, y));							//and store the location as the value
 			System.out.println("Found the shovel at (" + x + ", " + y + ")");		//Found at (3, 6)
-			if (gameMap.containsKey("Treasure")) {
-				shovelToTreasure();
-				Game.digTreasure();
-				System.out.println("I have dug the treasure, Task Complete!");
-				return;
-			}
+//			if (gameMap.containsKey("Treasure")) {
+//				shovelToTreasure();
+//				Game.digTreasure();
+//				System.out.println("I have dug the treasure, Task Complete!");
+//				gameMap.putIfAbsent("Completed", null);
+//			}
 		}
 		if (Game.hasTreasure()) {
-			gameMap.put("Treasure", new LinkedList<>());						//When we find treasure, create a new key
+			gameMap.putIfAbsent("Treasure", new LinkedList<>());						//When we find treasure, create a new key
 			gameMap.get("Treasure").add(new Position(x, y));					//and store the location as the value
 			System.out.println("Found the treasure at (" + x + ", " + y + ")");    //Found at (6, 2)
 			if (Game.hasShovel()) {										//incase we have the shovel, we finish the game
 				Game.digTreasure();
+				gameMap.putIfAbsent("Completed", null);
 			}
-		}			//**************************************************************************************************\\
-		if (canMoveDown()) {				//this is not DFS, we must figure out a way to properly implement it 
-			moveDown();						//our program goes in a circle
-		} 			//**************************************************************************************************\\
-		else if (canMoveRight()) {
-			moveRight();
 		}
-		else if (canMoveUp()) {
-			moveUp();
-		}
+		if (canMoveDown()) {
+			moveDown();
+		} 
 		else if (canMoveLeft()) {
 			moveLeft();
 		}
+		else if (canMoveRight()) {
+			moveRight();
+		}
 		else {
 			backtrack();
-			System.out.println(Game.getLocation());
     }
-		if (stack.size() < 31) {			//this is used for debugging, currently setting it 32 will crash the program
-		 explore();							//looping recursion for now since we don't have a method for shovel to treasure
-		 } else {
-			 return;
-		 }
+//		while (!gameMap.containsKey("Completed")) {			//this is used for debugging, currently setting it 32 will crash the program
+//			 explore();							//looping recursion for now since we don't have a method for shovel to treasure
+//			 }
 	} 
 		
 	public static void main(String[] args) throws GamePlayException, InvalidGameActionException, InvalidGameMoveException {
-		Game.play();					//starting the game
+	    x = 0;
+	    y = 0; 
+	    
+	    Position startPosition = new Position(x, y);	    
+	    stack.push(startPosition);
+	    visited.add(startPosition);
+
+	   	System.out.println("Starting position: " + startPosition);
+		
+		
+		Game.play();					//starting the game		
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
+		explore();						//calling our AI program to execute
 		explore();						//calling our AI program to execute
 
+		
+		
+		explore();						//calling our AI program to execute
+
+
+		
+		
 		System.out.println(gameMap);				//Debugging purpose
 		Game.quit();								//Quiting the game 
 	} 
